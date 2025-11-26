@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Enquiries</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+/* Background */
+body {
+    margin:0;
+    padding:0;
+    background: radial-gradient(circle at top, #0e0e12, #050507 70%);
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+}
+
+/* Top RGB neon line */
+.rgb-line {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(80deg, #ff005e, #6200ff, #00eaff, #00ff57);
+    background-size: 400% 400%;
+    animation: rgbFlow 4s linear infinite;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+@keyframes rgbFlow {
+    0% { background-position: 0%; }
+    50% { background-position: 100%; }
+    100% { background-position: 0%; }
+}
+
+/* Title */
+.admin-title {
+    text-align:center;
+    margin-top:70px;
+    font-size:38px;
+    font-weight:700;
+    text-shadow:0 0 15px rgba(255,255,255,0.2);
+}
+
+/* Glass panel */
+.glass-box {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+
+    box-shadow: 
+        0 0 35px rgba(0,0,0,0.55),
+        inset 0 0 22px rgba(255,255,255,0.03);
+}
+
+/* Table styling */
+table {
+    color:#fff !important;
+}
+
+thead {
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.table-bordered>:not(caption)>*>* {
+    border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* Download button */
+.btn-download {
+    background: linear-gradient(135deg, #00c853, #42ffa1);
+    border:none;
+    padding: 10px 20px;
+    border-radius:12px;
+    color:#000;
+    font-weight:600;
+    box-shadow: 0 0 20px rgba(0,255,120,0.45);
+    transition:0.2s;
+}
+.btn-download:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0,255,150,0.8);
+}
+/* Table container */
+.table-wrapper {
+    margin-top: 10px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(12px);
+    padding: 15px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.45),
+                inset 0 0 20px rgba(255,255,255,0.02);
+}
+
+/* Modern Table */
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Table Header */
+.modern-table thead th {
+    text-align: left;
+    padding: 14px;
+    font-size: 14px;
+    letter-spacing: 0.7px;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 2px solid rgba(255,255,255,0.08);
+    position: relative;
+}
+
+/* Neon underline effect */
+.modern-table thead th::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, #7a00ff, #00eaff);
+    box-shadow: 0 0 12px rgba(123,0,255,0.6);
+}
+
+/* Table Rows */
+.modern-table tbody tr {
+    transition: 0.25s;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 8px;
+}
+
+/* Cells */
+.modern-table td {
+    padding: 14px;
+    color: #d8d8d8;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Row hover effect */
+.modern-table tbody tr:hover {
+    background: rgba(255,255,255,0.08);
+    transform: scale(1.01);
+    box-shadow: 0 0 18px rgba(140, 0, 255, 0.45);
+}
+
+/* Last row fix */
+.modern-table tbody tr:last-child td {
+    border-bottom: none;
+}
+/* RESPONSIVE TABLE */
+@media (max-width: 900px) {
+    .table-wrapper {
+        overflow-x: auto;
+        padding: 5px;
+    }
+
+    .modern-table {
+        min-width: 800px; /* ensures mobile scroll */
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 600px) {
+    .admin-title {
+        font-size: 26px;
+        margin-top: 60px;
+    }
+
+    .glass-box {
+        padding: 18px;
+    }
+
+    .btn-download {
+        width: 100%;
+        text-align: center;
+    }
+
+    .modern-table td,
+    .modern-table thead th {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+/* Ultra small */
+@media (max-width: 400px) {
+    .admin-title {
+        font-size: 22px;
+    }
+
+    .modern-table {
+        min-width: 650px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="rgb-line"></div>
+
+<h2 class="admin-title">Admin – Enquiries</h2>
+
+<div class="container">
+    <div class="glass-box">
+
+        <button class="btn-download mb-3" id="downloadExcel">
+            ⬇ Download Excel
+        </button>
+<div class="table-wrapper">
+    <table class="modern-table" id="enquiryTable">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Type</th>
+                <th>Budget</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+    </div>
+</div>
+
+<script>
+let enquiries = JSON.parse(localStorage.getItem("enquiries")) || [];
+
+const tbody = document.querySelector("#enquiryTable tbody");
+
+function renderTable(){
+    tbody.innerHTML = "";
+    if(enquiries.length === 0){
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-light">No enquiries found</td></tr>`;
+        return;
+    }
+    enquiries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.time}</td>
+            <td>${row.name}</td>
+            <td>${row.email}</td>
+            <td>${row.phone}</td>
+            <td>${row.type}</td>
+            <td>${row.budget}</td>
+            <td>${row.message}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+renderTable();
+
+// Download to Excel
+document.getElementById("downloadExcel").addEventListener("click", ()=>{
+    if(enquiries.length===0){
+        alert("No data to save!");
+        return;
+    }
+    const ws = XLSX.utils.json_to_sheet(enquiries);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "PC_Requests");
+    XLSX.writeFile(wb, "enquiries.xlsx");
+});
+</script>
+
+</body>
+</html>
